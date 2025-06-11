@@ -19,6 +19,8 @@ const statusOptions = [
   'Cancelado'
 ] as const;
 
+type StatusType = typeof statusOptions[number];
+
 export const Projetos: React.FC = () => {
   const { projetos, addProjeto, updateProjeto, deleteProjeto, retiradas } = useInventory();
   const [searchTerm, setSearchTerm] = useState('');
@@ -29,7 +31,7 @@ export const Projetos: React.FC = () => {
   const [formData, setFormData] = useState({
     nomeCliente: '',
     marceneiroResponsavel: '',
-    status: 'Em andamento' as const,
+    status: 'Em andamento' as StatusType,
     materiaisUsados: [] as any[]
   });
 
@@ -38,7 +40,7 @@ export const Projetos: React.FC = () => {
       projeto.nomeCliente.toLowerCase().includes(searchTerm.toLowerCase()) ||
       projeto.marceneiroResponsavel.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesStatus = !statusFilter || projeto.status === statusFilter;
+    const matchesStatus = !statusFilter || statusFilter === 'all' || projeto.status === statusFilter;
     
     return matchesSearch && matchesStatus;
   });
@@ -180,7 +182,7 @@ export const Projetos: React.FC = () => {
                 <Label htmlFor="status">Status</Label>
                 <Select
                   value={formData.status}
-                  onValueChange={(value) => setFormData({ ...formData, status: value as any })}
+                  onValueChange={(value) => setFormData({ ...formData, status: value as StatusType })}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -216,7 +218,7 @@ export const Projetos: React.FC = () => {
                 <SelectValue placeholder="Filtrar por status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos os status</SelectItem>
+                <SelectItem value="all">Todos os status</SelectItem>
                 {statusOptions.map((status) => (
                   <SelectItem key={status} value={status}>
                     {status}
@@ -357,7 +359,7 @@ export const Projetos: React.FC = () => {
               <Label htmlFor="edit-status">Status</Label>
               <Select
                 value={formData.status}
-                onValueChange={(value) => setFormData({ ...formData, status: value as any })}
+                onValueChange={(value) => setFormData({ ...formData, status: value as StatusType })}
               >
                 <SelectTrigger>
                   <SelectValue />
