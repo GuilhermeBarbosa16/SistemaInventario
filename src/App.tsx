@@ -5,7 +5,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { InventoryProvider } from "./context/InventoryContext";
+import { AuthProvider } from "./hooks/useAuth";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Layout } from "./components/Layout";
+import { Login } from "./pages/Login";
 import { Dashboard } from "./pages/Dashboard";
 import { Inventario } from "./pages/Inventario";
 import { Retirada } from "./pages/Retirada";
@@ -20,20 +23,51 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <InventoryProvider>
-        <BrowserRouter>
-          <Layout>
+      <AuthProvider>
+        <InventoryProvider>
+          <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/inventario" element={<Inventario />} />
-              <Route path="/retirada" element={<Retirada />} />
-              <Route path="/historico" element={<Historico />} />
-              <Route path="/projetos" element={<Projetos />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/" element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Dashboard />
+                  </Layout>
+                </ProtectedRoute>
+              } />
+              <Route path="/inventario" element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Inventario />
+                  </Layout>
+                </ProtectedRoute>
+              } />
+              <Route path="/retirada" element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Retirada />
+                  </Layout>
+                </ProtectedRoute>
+              } />
+              <Route path="/historico" element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Historico />
+                  </Layout>
+                </ProtectedRoute>
+              } />
+              <Route path="/projetos" element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Projetos />
+                  </Layout>
+                </ProtectedRoute>
+              } />
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </Layout>
-        </BrowserRouter>
-      </InventoryProvider>
+          </BrowserRouter>
+        </InventoryProvider>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
