@@ -1,18 +1,24 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
+interface User {
+  email: string;
+  name?: string;
+}
+
 interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<boolean>;
+  register: (email: string, password: string, name: string) => Promise<boolean>;
   logout: () => void;
-  user: { email: string } | null;
+  user: User | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<{ email: string } | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     // Verificar se há token salvo no localStorage
@@ -39,6 +45,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return false;
   };
 
+  const register = async (email: string, password: string, name: string): Promise<boolean> => {
+    // Aqui você faria a chamada para sua API de registro
+    // Por enquanto, vamos simular um registro básico
+    if (email && password && name) {
+      const userData = { email, name };
+      setIsAuthenticated(true);
+      setUser(userData);
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('user', JSON.stringify(userData));
+      return true;
+    }
+    return false;
+  };
+
   const logout = () => {
     setIsAuthenticated(false);
     setUser(null);
@@ -47,7 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, user }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, register, logout, user }}>
       {children}
     </AuthContext.Provider>
   );
