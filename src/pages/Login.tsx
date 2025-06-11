@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Hammer, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -15,30 +16,37 @@ export const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulação de autenticação - substituir por API real
-    setTimeout(() => {
-      if (email && password) {
+    try {
+      const success = await login(email, password);
+      
+      if (success) {
         toast({
           title: "Login realizado com sucesso!",
           description: "Bem-vindo ao MarcenariaPro",
         });
-        // Aqui você salvaria o token de autenticação
-        localStorage.setItem('isAuthenticated', 'true');
         navigate('/');
       } else {
         toast({
           title: "Erro no login",
-          description: "Por favor, preencha todos os campos",
+          description: "Email ou senha inválidos",
           variant: "destructive",
         });
       }
+    } catch (error) {
+      toast({
+        title: "Erro no login",
+        description: "Ocorreu um erro inesperado",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
