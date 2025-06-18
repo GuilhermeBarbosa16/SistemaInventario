@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useInventory } from '../context/InventoryContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus, FolderOpen, User, Calendar, Edit, Trash2, Package } from 'lucide-react';
-import { Projeto } from '../types';
+import { Projeto, Ferragem } from '../types';
 
 const statusOptions = [
   'Em andamento',
@@ -24,7 +23,7 @@ type StatusType = typeof statusOptions[number];
 export const Projetos: React.FC = () => {
   const { projetos, addProjeto, updateProjeto, deleteProjeto, retiradas } = useInventory();
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingProjeto, setEditingProjeto] = useState<Projeto | null>(null);
@@ -32,7 +31,11 @@ export const Projetos: React.FC = () => {
     nomeCliente: '',
     marceneiroResponsavel: '',
     status: 'Em andamento' as StatusType,
-    materiaisUsados: [] as any[]
+    materiaisUsados: [] as Array<{
+      ferragemId: string;
+      quantidade: number;
+      ferragem: Ferragem;
+    }>
   });
 
   const filteredProjetos = projetos.filter(projeto => {

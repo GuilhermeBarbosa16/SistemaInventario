@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useInventory } from '../context/InventoryContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -67,7 +66,7 @@ export const Inventario: React.FC = () => {
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-wood-800 mb-2">Inventário de Ferragens</h1>
+          <h1 className="text-3xl font-bold text-wood-800 mb-2">Estoque de Ferragens</h1>
           <p className="text-wood-600">Gerencie o estoque de ferragens e materiais</p>
         </div>
         

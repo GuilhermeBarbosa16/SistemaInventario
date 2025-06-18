@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { InventoryContextType, Ferragem, Retirada, Projeto } from '../types';
 import { toast } from '@/hooks/use-toast';
@@ -71,7 +70,7 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setFerragens(prev => [...prev, newFerragem]);
     toast({
       title: "Ferragem adicionada",
-      description: `${ferragem.tipo} - ${ferragem.marca} foi adicionada ao inventário.`,
+      description: `${ferragem.tipo} - ${ferragem.marca} foi adicionada ao estoque.`,
     });
   };
 
@@ -87,7 +86,7 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setFerragens(prev => prev.filter(f => f.id !== id));
     toast({
       title: "Ferragem removida",
-      description: "A ferragem foi removida do inventário.",
+      description: "A ferragem foi removida do estoque.",
       variant: "destructive",
     });
   };

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -29,7 +28,7 @@ const menuItems = [
     icon: Home,
   },
   {
-    title: "Inventário",
+    title: "Estoque",
     url: "/inventario",
     icon: Package,
   },

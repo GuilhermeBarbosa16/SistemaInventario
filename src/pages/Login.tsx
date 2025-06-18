@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -7,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Hammer, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/context/AuthContext";
 
 export const Login: React.FC = () => {
   const [isLoginMode, setIsLoginMode] = useState(true);
@@ -28,21 +27,12 @@ export const Login: React.FC = () => {
 
     try {
       if (isLoginMode) {
-        const success = await login(email, password);
-        
-        if (success) {
-          toast({
-            title: "Login realizado com sucesso!",
-            description: "Bem-vindo ao MarcenariaPro",
-          });
-          navigate('/');
-        } else {
-          toast({
-            title: "Erro no login",
-            description: "Email ou senha inválidos",
-            variant: "destructive",
-          });
-        }
+        await login(email, password);
+        toast({
+          title: "Login realizado com sucesso!",
+          description: "Bem-vindo ao MarcenariaPro",
+        });
+        navigate('/');
       } else {
         // Modo registro
         if (password !== confirmPassword) {
@@ -63,26 +53,17 @@ export const Login: React.FC = () => {
           return;
         }
 
-        const success = await register(email, password, name);
-        
-        if (success) {
-          toast({
-            title: "Conta criada com sucesso!",
-            description: "Bem-vindo ao MarcenariaPro",
-          });
-          navigate('/');
-        } else {
-          toast({
-            title: "Erro no cadastro",
-            description: "Não foi possível criar a conta",
-            variant: "destructive",
-          });
-        }
+        await register(name, email, password, confirmPassword);
+        toast({
+          title: "Conta criada com sucesso!",
+          description: "Bem-vindo ao MarcenariaPro",
+        });
+        navigate('/');
       }
     } catch (error) {
       toast({
         title: isLoginMode ? "Erro no login" : "Erro no cadastro",
-        description: "Ocorreu um erro inesperado",
+        description: error instanceof Error ? error.message : "Ocorreu um erro inesperado",
         variant: "destructive",
       });
     } finally {

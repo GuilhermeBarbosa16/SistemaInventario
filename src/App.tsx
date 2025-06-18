@@ -1,11 +1,10 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { InventoryProvider } from "./context/InventoryContext";
-import { AuthProvider } from "./hooks/useAuth";
+import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Layout } from "./components/Layout";
 import { Login } from "./pages/Login";
@@ -14,6 +13,7 @@ import { Inventario } from "./pages/Inventario";
 import { Retirada } from "./pages/Retirada";
 import { Historico } from "./pages/Historico";
 import { Projetos } from "./pages/Projetos";
+import { ApiTest } from "./components/ApiTest";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +28,7 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/login" element={<Login />} />
+              <Route path="/api-test" element={<ApiTest />} />
               <Route path="/" element={
                 <ProtectedRoute>
                   <Layout>
