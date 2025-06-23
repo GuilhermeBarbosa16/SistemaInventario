@@ -148,83 +148,81 @@ export const Projetos: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-wood-800 mb-2">Gerenciamento de Projetos</h1>
-          <p className="text-wood-600">Organize e acompanhe os projetos de marcenaria</p>
-        </div>
-        
-        <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-wood-600 hover:bg-wood-700 text-white">
-              <Plus className="h-4 w-4 mr-2" />
-              Novo Projeto
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Criar Novo Projeto</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="name">Nome do Cliente</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Nome do cliente"
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="marceneiroResponsavel">Marceneiro Responsável</Label>
-                <Input
-                  id="marceneiroResponsavel"
-                  value={formData.marceneiroResponsavel}
-                  onChange={(e) => setFormData({ ...formData, marceneiroResponsavel: e.target.value })}
-                  placeholder="Nome do marceneiro"
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="status">Status</Label>
-                <Select
-                  value={formData.status}
-                  onValueChange={(value) => setFormData({ ...formData, status: value as StatusType })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {statusOptions.map((status) => (
-                      <SelectItem key={status} value={status}>
-                        {status}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="valor">Valor do Projeto (R$)</Label>
-                <Input
-                  id="valor"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={formData.valor}
-                  onChange={(e) => setFormData({ ...formData, valor: parseFloat(e.target.value) || 0 })}
-                  placeholder="Ex: 1500.00"
-                  required
-                />
-              </div>
-              <Button type="submit" className="w-full bg-wood-600 hover:bg-wood-700">
-                Criar Projeto
-              </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+    <div className="w-full min-h-[80vh] space-y-8 animate-fade-in p-2 sm:p-4 md:p-6">
+      <div className="text-center w-full">
+        <h1 className="text-3xl font-bold text-wood-800 mb-2">Gerenciamento de Projetos</h1>
+        <p className="text-wood-600">Organize e acompanhe os projetos de marcenaria</p>
       </div>
+      
+      <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+        <DialogTrigger asChild>
+          <Button className="bg-wood-600 hover:bg-wood-700 text-white">
+            <Plus className="h-4 w-4 mr-2" />
+            Novo Projeto
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Criar Novo Projeto</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="name">Nome do Cliente</Label>
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="Nome do cliente"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="marceneiroResponsavel">Marceneiro Responsável</Label>
+              <Input
+                id="marceneiroResponsavel"
+                value={formData.marceneiroResponsavel}
+                onChange={(e) => setFormData({ ...formData, marceneiroResponsavel: e.target.value })}
+                placeholder="Nome do marceneiro"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="status">Status</Label>
+              <Select
+                value={formData.status}
+                onValueChange={(value) => setFormData({ ...formData, status: value as StatusType })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {statusOptions.map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {status}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="valor">Valor do Projeto (R$)</Label>
+              <Input
+                id="valor"
+                type="number"
+                min="0"
+                step="0.01"
+                value={formData.valor}
+                onChange={(e) => setFormData({ ...formData, valor: parseFloat(e.target.value) || 0 })}
+                placeholder="Ex: 1500.00"
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full bg-wood-600 hover:bg-wood-700">
+              Criar Projeto
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Filtros */}
       <Card>
@@ -253,7 +251,7 @@ export const Projetos: React.FC = () => {
       </Card>
 
       {/* Lista de Projetos */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
         {filteredProjetos.map((projeto) => {
           const materiaisUsados = getMateriaisUsadosByCliente(projeto.name);
           
@@ -271,14 +269,6 @@ export const Projetos: React.FC = () => {
                       onClick={() => handleEdit(projeto)}
                     >
                       <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleDelete(projeto.id)}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>

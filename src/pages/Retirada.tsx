@@ -54,30 +54,30 @@ export const Retirada: React.FC = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
-      <div className="text-center">
+    <div className="w-full min-h-[80vh] space-y-8 animate-fade-in p-2 sm:p-4 md:p-6">
+      <div>
         <h1 className="text-3xl font-bold text-wood-800 mb-2">Nova Retirada</h1>
         <p className="text-wood-600">Registre a retirada de ferragens do estoque</p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Minus className="h-5 w-5" />
+      <Card className="w-full max-w-2xl mx-auto shadow-lg border-none rounded-2xl bg-gradient-to-br from-wood-50 to-white/80 p-0">
+        <CardHeader className="border-b border-wood-100 rounded-t-2xl bg-white/80 p-6">
+          <CardTitle className="flex items-center gap-2 text-2xl font-bold text-wood-800">
+            <Minus className="h-6 w-6 text-wood-600" />
             Registro de Retirada
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CardContent className="p-6">
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="md:col-span-2">
-                <Label htmlFor="ferragem">Ferragem *</Label>
+                <Label htmlFor="ferragem" className="mb-1 font-semibold">Ferragem *</Label>
                 <Select
                   value={formData.ferragemId}
                   onValueChange={(value) => setFormData({ ...formData, ferragemId: value })}
                   required
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="h-12 rounded-lg border-wood-200 bg-white/80 focus:border-wood-400">
                     <SelectValue placeholder="Selecione a ferragem" />
                   </SelectTrigger>
                   <SelectContent>
@@ -106,7 +106,7 @@ export const Retirada: React.FC = () => {
               </div>
 
               <div>
-                <Label htmlFor="quantidade">Quantidade *</Label>
+                <Label htmlFor="quantidade" className="mb-1 font-semibold">Quantidade *</Label>
                 <Input
                   id="quantidade"
                   type="number"
@@ -115,6 +115,7 @@ export const Retirada: React.FC = () => {
                   value={formData.quantidade}
                   onChange={(e) => setFormData({ ...formData, quantidade: parseInt(e.target.value) || 0 })}
                   required
+                  className="h-12 rounded-lg border-wood-200 bg-white/80 focus:border-wood-400"
                 />
                 {selectedFerragem && (
                   <div className="mt-2 text-sm">
@@ -136,42 +137,47 @@ export const Retirada: React.FC = () => {
               </div>
 
               <div>
-                <Label htmlFor="data">Data da Retirada *</Label>
+                <Label htmlFor="data" className="mb-1 font-semibold">Data da Retirada *</Label>
                 <Input
                   id="data"
                   type="date"
                   value={formData.data}
                   onChange={(e) => setFormData({ ...formData, data: e.target.value })}
                   required
+                  className="h-12 rounded-lg border-wood-200 bg-white/80 focus:border-wood-400"
                 />
               </div>
 
               <div>
-                <Label htmlFor="cliente">Cliente *</Label>
+                <Label htmlFor="cliente" className="mb-1 font-semibold">Cliente *</Label>
                 <Input
                   id="cliente"
                   value={formData.cliente}
                   onChange={(e) => setFormData({ ...formData, cliente: e.target.value })}
                   placeholder="Nome do cliente"
                   required
+                  className="h-12 rounded-lg border-wood-200 bg-white/80 focus:border-wood-400"
                 />
               </div>
 
               <div>
-                <Label htmlFor="responsavel">Responsável *</Label>
+                <Label htmlFor="responsavel" className="mb-1 font-semibold">Responsável *</Label>
                 <Input
                   id="responsavel"
                   value={formData.responsavel}
                   onChange={(e) => setFormData({ ...formData, responsavel: e.target.value })}
                   placeholder="Nome do colaborador"
                   required
+                  className="h-12 rounded-lg border-wood-200 bg-white/80 focus:border-wood-400"
                 />
               </div>
             </div>
 
             {selectedFerragem && (
-              <div className="p-4 bg-wood-50 rounded-lg border border-wood-200">
-                <h3 className="font-semibold text-wood-800 mb-2">Resumo da Retirada</h3>
+              <div className="p-4 bg-wood-50/80 rounded-xl border border-wood-200 mt-4 flex flex-col gap-2 shadow-sm">
+                <h3 className="font-semibold text-wood-800 mb-2 flex items-center gap-2">
+                  <Minus className="h-4 w-4 text-wood-600" /> Resumo da Retirada
+                </h3>
                 <div className="space-y-1 text-sm text-wood-600">
                   <p><strong>Ferragem:</strong> {selectedFerragem.tipo} - {selectedFerragem.marca}</p>
                   <p><strong>Quantidade atual:</strong> {selectedFerragem.quantidade} unidades</p>
@@ -191,7 +197,7 @@ export const Retirada: React.FC = () => {
 
             <Button 
               type="submit" 
-              className="w-full bg-wood-600 hover:bg-wood-700"
+              className="w-full h-12 rounded-lg bg-wood-600 hover:bg-wood-700 text-lg font-semibold shadow-md transition-all duration-200"
               disabled={!selectedFerragem || formData.quantidade <= 0 || !isQuantityValid || isLoading}
             >
               {isLoading ? 'Registrando...' : 'Registrar Retirada'}

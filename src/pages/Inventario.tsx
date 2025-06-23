@@ -104,129 +104,127 @@ export const Inventario: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-wood-800 mb-2">Estoque de Ferragens</h1>
-          <p className="text-wood-600">Gerencie o estoque de ferragens e materiais</p>
-        </div>
-        
-        <div className="flex gap-2">
-          <Dialog open={isEntradaModalOpen} onOpenChange={setIsEntradaModalOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-green-600 hover:bg-green-700 text-white">
-                <Plus className="h-4 w-4 mr-2" />
-                Entrada de Produto
+    <div className="w-full min-h-[80vh] space-y-8 animate-fade-in p-2 sm:p-4 md:p-6">
+      <div className="text-center w-full">
+        <h1 className="text-3xl font-bold text-wood-800 mb-2">Estoque de Ferragens</h1>
+        <p className="text-wood-600">Gerencie o estoque de ferragens e materiais</p>
+      </div>
+      
+      <div className="flex gap-2">
+        <Dialog open={isEntradaModalOpen} onOpenChange={setIsEntradaModalOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-green-600 hover:bg-green-700 text-white">
+              <Plus className="h-4 w-4 mr-2" />
+              Entrada de Produto
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Registrar Entrada de Produto</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleEntradaSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="ferragemId">Ferragem/Produto</Label>
+                <select
+                  id="ferragemId"
+                  value={entradaData.ferragemId}
+                  onChange={e => setEntradaData({ ...entradaData, ferragemId: e.target.value })}
+                  required
+                  className="w-full border rounded px-3 py-2"
+                >
+                  <option value="">Selecione...</option>
+                  {ferragens.map(f => (
+                    <option key={f.id} value={f.id}>
+                      {f.tipo} - {f.marca}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <Label htmlFor="quantidadeEntrada">Quantidade</Label>
+                <Input
+                  id="quantidadeEntrada"
+                  type="number"
+                  min="1"
+                  value={entradaData.quantidade}
+                  onChange={e => setEntradaData({ ...entradaData, quantidade: parseInt(e.target.value) || 0 })}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="motivoEntrada">Motivo/Observação</Label>
+                <Input
+                  id="motivoEntrada"
+                  value={entradaData.motivo}
+                  onChange={e => setEntradaData({ ...entradaData, motivo: e.target.value })}
+                  placeholder="Ex: Compra, devolução, ajuste..."
+                />
+              </div>
+              <Button type="submit" className="w-full bg-green-600 hover:bg-green-700" disabled={isLoadingEntrada}>
+                {isLoadingEntrada ? 'Registrando...' : 'Registrar Entrada'}
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Registrar Entrada de Produto</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleEntradaSubmit} className="space-y-4">
-                <div>
-                  <Label htmlFor="ferragemId">Ferragem/Produto</Label>
-                  <select
-                    id="ferragemId"
-                    value={entradaData.ferragemId}
-                    onChange={e => setEntradaData({ ...entradaData, ferragemId: e.target.value })}
-                    required
-                    className="w-full border rounded px-3 py-2"
-                  >
-                    <option value="">Selecione...</option>
-                    {ferragens.map(f => (
-                      <option key={f.id} value={f.id}>
-                        {f.tipo} - {f.marca}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <Label htmlFor="quantidadeEntrada">Quantidade</Label>
-                  <Input
-                    id="quantidadeEntrada"
-                    type="number"
-                    min="1"
-                    value={entradaData.quantidade}
-                    onChange={e => setEntradaData({ ...entradaData, quantidade: parseInt(e.target.value) || 0 })}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="motivoEntrada">Motivo/Observação</Label>
-                  <Input
-                    id="motivoEntrada"
-                    value={entradaData.motivo}
-                    onChange={e => setEntradaData({ ...entradaData, motivo: e.target.value })}
-                    placeholder="Ex: Compra, devolução, ajuste..."
-                  />
-                </div>
-                <Button type="submit" className="w-full bg-green-600 hover:bg-green-700" disabled={isLoadingEntrada}>
-                  {isLoadingEntrada ? 'Registrando...' : 'Registrar Entrada'}
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
-          <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-wood-600 hover:bg-wood-700 text-white">
-                <Plus className="h-4 w-4 mr-2" />
+            </form>
+          </DialogContent>
+        </Dialog>
+        <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-wood-600 hover:bg-wood-700 text-white">
+              <Plus className="h-4 w-4 mr-2" />
+              Adicionar Ferragem
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Adicionar Nova Ferragem</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="tipo">Tipo da Ferragem</Label>
+                <Input
+                  id="tipo"
+                  value={formData.tipo}
+                  onChange={(e) => setFormData({ ...formData, tipo: e.target.value })}
+                  placeholder="Ex: Dobradiça, Corrediça, Puxador..."
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="marca">Marca</Label>
+                <Input
+                  id="marca"
+                  value={formData.marca}
+                  onChange={(e) => setFormData({ ...formData, marca: e.target.value })}
+                  placeholder="Ex: Hafele, Blum, Tramontina..."
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="quantidade">Quantidade</Label>
+                <Input
+                  id="quantidade"
+                  type="number"
+                  min="0"
+                  value={formData.quantidade}
+                  onChange={(e) => setFormData({ ...formData, quantidade: parseInt(e.target.value) || 0 })}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="categoria">Categoria</Label>
+                <Input
+                  id="categoria"
+                  value={formData.categoria}
+                  onChange={(e) => setFormData({ ...formData, categoria: e.target.value })}
+                  placeholder="Ex: Ferragens, Parafusos, Acessórios..."
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full bg-wood-600 hover:bg-wood-700">
                 Adicionar Ferragem
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Adicionar Nova Ferragem</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <Label htmlFor="tipo">Tipo da Ferragem</Label>
-                  <Input
-                    id="tipo"
-                    value={formData.tipo}
-                    onChange={(e) => setFormData({ ...formData, tipo: e.target.value })}
-                    placeholder="Ex: Dobradiça, Corrediça, Puxador..."
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="marca">Marca</Label>
-                  <Input
-                    id="marca"
-                    value={formData.marca}
-                    onChange={(e) => setFormData({ ...formData, marca: e.target.value })}
-                    placeholder="Ex: Hafele, Blum, Tramontina..."
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="quantidade">Quantidade</Label>
-                  <Input
-                    id="quantidade"
-                    type="number"
-                    min="0"
-                    value={formData.quantidade}
-                    onChange={(e) => setFormData({ ...formData, quantidade: parseInt(e.target.value) || 0 })}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="categoria">Categoria</Label>
-                  <Input
-                    id="categoria"
-                    value={formData.categoria}
-                    onChange={(e) => setFormData({ ...formData, categoria: e.target.value })}
-                    placeholder="Ex: Ferragens, Parafusos, Acessórios..."
-                    required
-                  />
-                </div>
-                <Button type="submit" className="w-full bg-wood-600 hover:bg-wood-700">
-                  Adicionar Ferragem
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Busca */}
@@ -245,7 +243,7 @@ export const Inventario: React.FC = () => {
       </Card>
 
       {/* Lista de Ferragens */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
         {filteredFerragens.map((ferragem) => (
           <Card key={ferragem.id} className="hover-lift">
             <CardHeader className="pb-3">
@@ -260,14 +258,6 @@ export const Inventario: React.FC = () => {
                     onClick={() => handleEdit(ferragem)}
                   >
                     <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleDelete(ferragem.id)}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </div>

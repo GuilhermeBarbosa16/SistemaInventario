@@ -35,24 +35,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen">
+      <div className="flex min-h-screen w-full">
         <AppSidebar />
-        
-        <main className="flex-1 min-w-0 p-2 sm:p-4 md:p-6 bg-gradient-to-br from-wood-50 to-wood-100">
-          <div className="mb-4 flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <SidebarTrigger />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleMenuClick}
-                className="border-wood-300 text-wood-700 hover:bg-wood-100"
-              >
-                <Menu className="h-4 w-4 mr-2" />
-                Menu Teste
-              </Button>
-            </div>
-            <div className="flex items-center gap-4">
+        <main className="flex-1 w-full min-w-0 bg-gradient-to-br from-wood-50 to-wood-100">
+          <div className="mb-4 flex w-full justify-end items-center px-4 md:px-8">
+            <div className="flex items-center gap-4 ml-auto">
               {user && (
                 <span className="text-sm text-wood-600">
                   Olá, {user.name}

@@ -40,8 +40,8 @@ export const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in w-full max-w-none">
-      <div>
+    <div className="w-full min-h-[80vh] space-y-8 animate-fade-in p-2 sm:p-4 md:p-6">
+      <div className="text-center w-full">
         <h1 className="text-3xl font-bold text-wood-800 mb-2">Dashboard</h1>
         <p className="text-wood-600">Visão geral do sistema de marcenaria</p>
       </div>

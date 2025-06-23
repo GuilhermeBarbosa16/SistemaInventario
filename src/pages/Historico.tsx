@@ -28,14 +28,14 @@ export const Historico: React.FC = () => {
   const clientesUnicos = new Set(filteredRetiradas.map(r => r.cliente)).size;
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div>
+    <div className="w-full min-h-[80vh] space-y-8 animate-fade-in p-2 sm:p-4 md:p-6">
+      <div className="text-center w-full">
         <h1 className="text-3xl font-bold text-wood-800 mb-2">Histórico de Retiradas</h1>
         <p className="text-wood-600">Visualize todas as movimentações do estoque</p>
       </div>
 
       {/* Estatísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
