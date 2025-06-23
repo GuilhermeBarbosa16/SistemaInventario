@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useInventory } from '../context/InventoryContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,20 +13,19 @@ export const Historico: React.FC = () => {
 
   const filteredRetiradas = retiradas
     .filter(retirada => {
-      const matchesSearch = 
-        retirada.cliente.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        retirada.responsavel.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        retirada.ferragem.tipo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        retirada.ferragem.marca.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesDate = !dateFilter || retirada.data === dateFilter;
-      
+      const matchesSearch =
+        (retirada.ferragem?.tipo?.toLowerCase().includes(searchTerm.toLowerCase()) || '') ||
+        (retirada.ferragem?.marca?.toLowerCase().includes(searchTerm.toLowerCase()) || '') ||
+        (retirada.cliente?.toLowerCase().includes(searchTerm.toLowerCase()) || '') ||
+        (retirada.responsavel?.toLowerCase().includes(searchTerm.toLowerCase()) || '');
+      const matchesDate = !dateFilter || (retirada.data && retirada.data.startsWith(dateFilter));
       return matchesSearch && matchesDate;
     })
     .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime());
 
   const totalRetiradas = filteredRetiradas.length;
-  const totalQuantidade = filteredRetiradas.reduce((sum, r) => sum + r.quantidade, 0);
+  const totalQuantidade = filteredRetiradas.reduce((sum, r) => sum + Number(r.quantidade), 0);
+  const clientesUnicos = new Set(filteredRetiradas.map(r => r.cliente)).size;
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -74,9 +72,7 @@ export const Historico: React.FC = () => {
               </div>
               <div>
                 <p className="text-sm text-wood-600">Clientes Únicos</p>
-                <p className="text-xl font-bold text-wood-800">
-                  {new Set(filteredRetiradas.map(r => r.cliente)).size}
-                </p>
+                <p className="text-xl font-bold text-wood-800">{clientesUnicos}</p>
               </div>
             </div>
           </CardContent>
@@ -90,7 +86,7 @@ export const Historico: React.FC = () => {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-wood-500 h-4 w-4" />
               <Input
-                placeholder="Buscar por cliente, responsável ou ferragem..."
+                placeholder="Buscar por tipo, marca, cliente ou responsável..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -127,7 +123,6 @@ export const Historico: React.FC = () => {
                   <TableHead>Quantidade</TableHead>
                   <TableHead>Cliente</TableHead>
                   <TableHead>Responsável</TableHead>
-                  <TableHead>Status Estoque</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -136,16 +131,15 @@ export const Historico: React.FC = () => {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-wood-500" />
-                        {new Date(retirada.data).toLocaleDateString('pt-BR')}
+                        {retirada.data ? new Date(retirada.data).toLocaleDateString('pt-BR') : '-'}
                       </div>
                     </TableCell>
                     <TableCell>
                       <div>
                         <p className="font-medium text-wood-800">
-                          {retirada.ferragem.tipo}
-                        </p>
-                        <p className="text-sm text-wood-600">
-                          {retirada.ferragem.marca}
+                          {retirada.ferragem
+                            ? `${retirada.ferragem.tipo} - ${retirada.ferragem.marca}`
+                            : 'Ferragem removida'}
                         </p>
                       </div>
                     </TableCell>
@@ -161,13 +155,6 @@ export const Historico: React.FC = () => {
                       </div>
                     </TableCell>
                     <TableCell>{retirada.responsavel}</TableCell>
-                    <TableCell>
-                      {retirada.ferragem.quantidade <= 3 ? (
-                        <Badge variant="destructive">Estoque Baixo</Badge>
-                      ) : (
-                        <Badge className="bg-green-100 text-green-800">Normal</Badge>
-                      )}
-                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -176,8 +163,8 @@ export const Historico: React.FC = () => {
             <div className="text-center py-8">
               <History className="h-12 w-12 text-wood-400 mx-auto mb-4" />
               <p className="text-wood-600">
-                {searchTerm || dateFilter 
-                  ? 'Nenhuma retirada encontrada com esses filtros.' 
+                {searchTerm || dateFilter
+                  ? 'Nenhuma retirada encontrada com esses filtros.'
                   : 'Nenhuma retirada registrada ainda.'
                 }
               </p>

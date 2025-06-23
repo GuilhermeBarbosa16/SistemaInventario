@@ -1,171 +1,178 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { InventoryContextType, Ferragem, Retirada, Projeto } from '../types';
 import { toast } from '@/hooks/use-toast';
+import apiService from '@/lib/api';
 
 const InventoryContext = createContext<InventoryContextType | undefined>(undefined);
 
-// Dados iniciais para demonstração
-const initialFerragens: Ferragem[] = [
-  { id: '1', tipo: 'Dobradiça', marca: 'Hafele', quantidade: 2, categoria: 'Ferragens' },
-  { id: '2', tipo: 'Corrediça', marca: 'Blum', quantidade: 8, categoria: 'Ferragens' },
-  { id: '3', tipo: 'Puxador', marca: 'Tramontina', quantidade: 1, categoria: 'Ferragens' },
-  { id: '4', tipo: 'Fechadura', marca: 'Stam', quantidade: 15, categoria: 'Ferragens' },
-  { id: '5', tipo: 'Parafuso', marca: 'Wurth', quantidade: 50, categoria: 'Ferragens' },
-];
-
-const initialRetiradas: Retirada[] = [
-  {
-    id: '1',
-    ferragemId: '1',
-    ferragem: initialFerragens[0],
-    quantidade: 4,
-    cliente: 'João Silva',
-    data: '2024-06-10',
-    responsavel: 'Carlos Santos'
-  },
-  {
-    id: '2',
-    ferragemId: '2',
-    ferragem: initialFerragens[1],
-    quantidade: 2,
-    cliente: 'Maria Oliveira',
-    data: '2024-06-09',
-    responsavel: 'Pedro Lima'
-  },
-];
-
-const initialProjetos: Projeto[] = [
-  {
-    id: '1',
-    nomeCliente: 'João Silva',
-    marceneiroResponsavel: 'Carlos Santos',
-    status: 'Em andamento',
-    materiaisUsados: [
-      { ferragemId: '1', quantidade: 4, ferragem: initialFerragens[0] },
-      { ferragemId: '2', quantidade: 2, ferragem: initialFerragens[1] },
-    ],
-    dataCriacao: '2024-06-01',
-    dataAtualizacao: '2024-06-10'
-  },
-  {
-    id: '2',
-    nomeCliente: 'Maria Oliveira',
-    marceneiroResponsavel: 'Pedro Lima',
-    status: 'Finalizado',
-    materiaisUsados: [
-      { ferragemId: '3', quantidade: 6, ferragem: initialFerragens[2] },
-    ],
-    dataCriacao: '2024-05-15',
-    dataAtualizacao: '2024-06-05'
-  },
-];
-
 export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [ferragens, setFerragens] = useState<Ferragem[]>(initialFerragens);
-  const [retiradas, setRetiradas] = useState<Retirada[]>(initialRetiradas);
-  const [projetos, setProjetos] = useState<Projeto[]>(initialProjetos);
+  const [ferragens, setFerragens] = useState<Ferragem[]>([]);
+  const [retiradas, setRetiradas] = useState<Retirada[]>([]);
+  const [projetos, setProjetos] = useState<Projeto[]>([]);
 
-  const addFerragem = (ferragem: Omit<Ferragem, 'id'>) => {
-    const newFerragem = { ...ferragem, id: Date.now().toString() };
-    setFerragens(prev => [...prev, newFerragem]);
-    toast({
-      title: "Ferragem adicionada",
-      description: `${ferragem.tipo} - ${ferragem.marca} foi adicionada ao estoque.`,
-    });
+  // Buscar histórico real de retiradas
+  const fetchRetiradas = async () => {
+    try {
+      const response = await apiService.getToolMovements();
+      if (response.status === 'success' && response.data) {
+        // Mapeia cada retirada para garantir que tenha o campo ferragem
+        const mapped = (response.data as any[]).map((r) => ({
+          ...r,
+          ferragem: r.tool,
+          quantidade: r.quantity,
+          data: r.data || r.created_at,
+        }));
+        setRetiradas(mapped);
+      }
+    } catch (error) {
+      toast({
+        title: 'Erro ao carregar histórico',
+        description: 'Não foi possível buscar o histórico de retiradas.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  useEffect(() => {
+    const fetchFerragens = async () => {
+      try {
+        const response = await apiService.getTools();
+        if (response.status === 'success' && response.data) {
+          setFerragens(response.data as Ferragem[]);
+        }
+      } catch (error) {
+        toast({
+          title: 'Erro ao carregar ferragens',
+          description: 'Não foi possível buscar as ferragens do servidor.',
+          variant: 'destructive',
+        });
+      }
+    };
+    const fetchProjetos = async () => {
+      try {
+        const response = await apiService.getProjects();
+        if (response.status === 'success' && response.data) {
+          setProjetos(response.data as Projeto[]);
+        }
+      } catch (error) {
+        toast({
+          title: 'Erro ao carregar projetos',
+          description: 'Não foi possível buscar os projetos do servidor.',
+          variant: 'destructive',
+        });
+      }
+    };
+    fetchFerragens();
+    fetchProjetos();
+    fetchRetiradas();
+  }, []);
+
+  const addFerragem = async (ferragem: Omit<Ferragem, 'id'>) => {
+    try {
+      const response = await apiService.createTool(ferragem);
+      if (response.status === 'success' && response.data) {
+        setFerragens(prev => [...prev, response.data as Ferragem]);
+        const ferragemData = response.data as Ferragem;
+        toast({
+          title: "Ferragem adicionada",
+          description: `${ferragemData.tipo} - ${ferragemData.marca} foi adicionada ao estoque.`,
+        });
+      } else {
+        throw new Error(response.message || 'Erro ao cadastrar ferragem');
+      }
+    } catch (error: any) {
+      toast({
+        title: "Erro ao cadastrar ferragem",
+        description: error?.message || "Erro desconhecido",
+        variant: "destructive",
+      });
+    }
   };
 
   const updateFerragem = (id: string, updates: Partial<Ferragem>) => {
-    setFerragens(prev => prev.map(f => f.id === id ? { ...f, ...updates } : f));
     toast({
-      title: "Ferragem atualizada",
-      description: "As informações da ferragem foram atualizadas com sucesso.",
+      title: 'Funcionalidade não implementada',
+      description: 'Adicione a integração com a API para atualizar ferragens.',
+      variant: 'destructive',
     });
   };
 
   const deleteFerragem = (id: string) => {
-    setFerragens(prev => prev.filter(f => f.id !== id));
     toast({
-      title: "Ferragem removida",
-      description: "A ferragem foi removida do estoque.",
-      variant: "destructive",
+      title: 'Funcionalidade não implementada',
+      description: 'Adicione a integração com a API para remover ferragens.',
+      variant: 'destructive',
     });
   };
 
-  const addRetirada = (retirada: Omit<Retirada, 'id' | 'ferragem'>) => {
-    const ferragem = ferragens.find(f => f.id === retirada.ferragemId);
-    if (!ferragem) {
-      toast({
-        title: "Erro",
-        description: "Ferragem não encontrada.",
-        variant: "destructive",
+  // Registrar retirada via API e atualizar estoque/histórico
+  const addRetirada = async (retirada: Omit<Retirada, 'id' | 'ferragem'>) => {
+    try {
+      const response = await apiService.createToolMovement({
+        tool_id: retirada.ferragemId,
+        type: 'saida',
+        quantity: retirada.quantidade,
+        data: retirada.data,
+        cliente: retirada.cliente,
+        responsavel: retirada.responsavel,
       });
-      return;
-    }
-
-    if (ferragem.quantidade < retirada.quantidade) {
+      if (response.status === 'success') {
+        toast({
+          title: 'Retirada registrada',
+          description: 'A retirada foi registrada com sucesso.',
+        });
+        // Atualiza o estoque e o histórico
+        const ferragensResp = await apiService.getTools();
+        if (ferragensResp.status === 'success' && ferragensResp.data) {
+          setFerragens(ferragensResp.data as Ferragem[]);
+        }
+        fetchRetiradas();
+      } else {
+        throw new Error(response.message || 'Erro ao registrar retirada');
+      }
+    } catch (error: any) {
       toast({
-        title: "Estoque insuficiente",
-        description: "Não há quantidade suficiente em estoque para esta retirada.",
-        variant: "destructive",
+        title: 'Erro ao registrar retirada',
+        description: error?.message || 'Erro desconhecido',
+        variant: 'destructive',
       });
-      return;
     }
-
-    const newRetirada = { 
-      ...retirada, 
-      id: Date.now().toString(),
-      ferragem: ferragem
-    };
-    
-    setRetiradas(prev => [...prev, newRetirada]);
-    
-    // Atualizar estoque
-    setFerragens(prev => prev.map(f => 
-      f.id === retirada.ferragemId 
-        ? { ...f, quantidade: f.quantidade - retirada.quantidade }
-        : f
-    ));
-
-    toast({
-      title: "Retirada registrada",
-      description: `${retirada.quantidade} unidades de ${ferragem.tipo} retiradas do estoque.`,
-    });
   };
 
-  const addProjeto = (projeto: Omit<Projeto, 'id' | 'dataCriacao' | 'dataAtualizacao'>) => {
-    const now = new Date().toISOString().split('T')[0];
-    const newProjeto = { 
-      ...projeto, 
-      id: Date.now().toString(),
-      dataCriacao: now,
-      dataAtualizacao: now
-    };
-    setProjetos(prev => [...prev, newProjeto]);
-    toast({
-      title: "Projeto criado",
-      description: `Projeto para ${projeto.nomeCliente} foi criado com sucesso.`,
-    });
+  const addProjeto = async (projeto: Omit<Projeto, 'id' | 'dataCriacao' | 'dataAtualizacao'>) => {
+    try {
+      const response = await apiService.createProject(projeto);
+      if (response.status === 'success' && response.data) {
+        setProjetos(prev => [...prev, response.data as Projeto]);
+        toast({
+          title: "Projeto criado",
+          description: "Projeto criado com sucesso!",
+        });
+      } else {
+        throw new Error(response.message || 'Erro ao criar projeto');
+      }
+    } catch (error: any) {
+      toast({
+        title: "Erro ao criar projeto",
+        description: error?.message || "Erro desconhecido",
+        variant: "destructive",
+      });
+    }
   };
 
   const updateProjeto = (id: string, updates: Partial<Projeto>) => {
-    const now = new Date().toISOString().split('T')[0];
-    setProjetos(prev => prev.map(p => 
-      p.id === id 
-        ? { ...p, ...updates, dataAtualizacao: now }
-        : p
-    ));
     toast({
-      title: "Projeto atualizado",
-      description: "As informações do projeto foram atualizadas com sucesso.",
+      title: 'Funcionalidade não implementada',
+      description: 'Adicione a integração com a API para atualizar projetos.',
+      variant: 'destructive',
     });
   };
 
   const deleteProjeto = (id: string) => {
-    setProjetos(prev => prev.filter(p => p.id !== id));
     toast({
-      title: "Projeto removido",
-      description: "O projeto foi removido com sucesso.",
-      variant: "destructive",
+      title: 'Funcionalidade não implementada',
+      description: 'Adicione a integração com a API para remover projetos.',
+      variant: 'destructive',
     });
   };
 

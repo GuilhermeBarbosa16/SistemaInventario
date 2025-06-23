@@ -28,19 +28,20 @@ export const Projetos: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingProjeto, setEditingProjeto] = useState<Projeto | null>(null);
   const [formData, setFormData] = useState({
-    nomeCliente: '',
+    name: '',
     marceneiroResponsavel: '',
     status: 'Em andamento' as StatusType,
     materiaisUsados: [] as Array<{
       ferragemId: string;
       quantidade: number;
       ferragem: Ferragem;
-    }>
+    }>,
+    valor: 0,
   });
 
   const filteredProjetos = projetos.filter(projeto => {
     const matchesSearch = 
-      projeto.nomeCliente.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      projeto.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       projeto.marceneiroResponsavel.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = !statusFilter || statusFilter === 'all' || projeto.status === statusFilter;
@@ -59,8 +60,8 @@ export const Projetos: React.FC = () => {
     }
   };
 
-  const getMateriaisUsadosByCliente = (nomeCliente: string) => {
-    const retiradasCliente = retiradas.filter(r => r.cliente === nomeCliente);
+  const getMateriaisUsadosByCliente = (name: string) => {
+    const retiradasCliente = retiradas.filter(r => r.cliente === name);
     const materiaisMap = new Map();
     
     retiradasCliente.forEach(retirada => {
@@ -83,20 +84,22 @@ export const Projetos: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const materiaisUsados = getMateriaisUsadosByCliente(formData.nomeCliente);
+    const materiaisUsados = getMateriaisUsadosByCliente(formData.name);
     addProjeto({
       ...formData,
       materiaisUsados: materiaisUsados.map(m => ({
         ferragemId: m.ferragem.id,
         quantidade: m.quantidade,
         ferragem: m.ferragem
-      }))
+      })),
+      valor: formData.valor,
     });
     setFormData({
-      nomeCliente: '',
+      name: '',
       marceneiroResponsavel: '',
       status: 'Em andamento',
-      materiaisUsados: []
+      materiaisUsados: [],
+      valor: 0,
     });
     setIsAddModalOpen(false);
   };
@@ -104,10 +107,11 @@ export const Projetos: React.FC = () => {
   const handleEdit = (projeto: Projeto) => {
     setEditingProjeto(projeto);
     setFormData({
-      nomeCliente: projeto.nomeCliente,
+      name: projeto.name,
       marceneiroResponsavel: projeto.marceneiroResponsavel,
       status: projeto.status,
-      materiaisUsados: projeto.materiaisUsados
+      materiaisUsados: projeto.materiaisUsados,
+      valor: projeto.valor,
     });
     setIsEditModalOpen(true);
   };
@@ -115,22 +119,24 @@ export const Projetos: React.FC = () => {
   const handleUpdate = (e: React.FormEvent) => {
     e.preventDefault();
     if (editingProjeto) {
-      const materiaisUsados = getMateriaisUsadosByCliente(formData.nomeCliente);
+      const materiaisUsados = getMateriaisUsadosByCliente(formData.name);
       updateProjeto(editingProjeto.id, {
         ...formData,
         materiaisUsados: materiaisUsados.map(m => ({
           ferragemId: m.ferragem.id,
           quantidade: m.quantidade,
           ferragem: m.ferragem
-        }))
+        })),
+        valor: formData.valor,
       });
       setIsEditModalOpen(false);
       setEditingProjeto(null);
       setFormData({
-        nomeCliente: '',
+        name: '',
         marceneiroResponsavel: '',
         status: 'Em andamento',
-        materiaisUsados: []
+        materiaisUsados: [],
+        valor: 0,
       });
     }
   };
@@ -162,11 +168,11 @@ export const Projetos: React.FC = () => {
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="nomeCliente">Nome do Cliente</Label>
+                <Label htmlFor="name">Nome do Cliente</Label>
                 <Input
-                  id="nomeCliente"
-                  value={formData.nomeCliente}
-                  onChange={(e) => setFormData({ ...formData, nomeCliente: e.target.value })}
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Nome do cliente"
                   required
                 />
@@ -198,6 +204,19 @@ export const Projetos: React.FC = () => {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+              <div>
+                <Label htmlFor="valor">Valor do Projeto (R$)</Label>
+                <Input
+                  id="valor"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={formData.valor}
+                  onChange={(e) => setFormData({ ...formData, valor: parseFloat(e.target.value) || 0 })}
+                  placeholder="Ex: 1500.00"
+                  required
+                />
               </div>
               <Button type="submit" className="w-full bg-wood-600 hover:bg-wood-700">
                 Criar Projeto
@@ -236,14 +255,14 @@ export const Projetos: React.FC = () => {
       {/* Lista de Projetos */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {filteredProjetos.map((projeto) => {
-          const materiaisUsados = getMateriaisUsadosByCliente(projeto.nomeCliente);
+          const materiaisUsados = getMateriaisUsadosByCliente(projeto.name);
           
           return (
             <Card key={projeto.id} className="hover-lift">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg text-wood-800">
-                    {projeto.nomeCliente}
+                    {projeto.name}
                   </CardTitle>
                   <div className="flex gap-2">
                     <Button
@@ -274,6 +293,10 @@ export const Projetos: React.FC = () => {
                     <div className="flex items-center gap-2">
                       <User className="h-4 w-4 text-wood-500" />
                       <span className="font-medium text-wood-800">{projeto.marceneiroResponsavel}</span>
+                    </div>
+                    <p className="text-sm text-wood-600 mt-2">Valor do Projeto</p>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-wood-800">R$ {Number(projeto.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                     </div>
                   </div>
                   <div>
@@ -341,11 +364,11 @@ export const Projetos: React.FC = () => {
           </DialogHeader>
           <form onSubmit={handleUpdate} className="space-y-4">
             <div>
-              <Label htmlFor="edit-nomeCliente">Nome do Cliente</Label>
+              <Label htmlFor="edit-name">Nome do Cliente</Label>
               <Input
-                id="edit-nomeCliente"
-                value={formData.nomeCliente}
-                onChange={(e) => setFormData({ ...formData, nomeCliente: e.target.value })}
+                id="edit-name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
               />
             </div>
@@ -375,6 +398,19 @@ export const Projetos: React.FC = () => {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div>
+              <Label htmlFor="edit-valor">Valor do Projeto (R$)</Label>
+              <Input
+                id="edit-valor"
+                type="number"
+                min="0"
+                step="0.01"
+                value={formData.valor}
+                onChange={(e) => setFormData({ ...formData, valor: parseFloat(e.target.value) || 0 })}
+                placeholder="Ex: 1500.00"
+                required
+              />
             </div>
             <Button type="submit" className="w-full bg-wood-600 hover:bg-wood-700">
               Atualizar Projeto

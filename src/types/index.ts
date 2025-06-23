@@ -1,4 +1,3 @@
-
 export interface Ferragem {
   id: string;
   tipo: string;
@@ -19,7 +18,7 @@ export interface Retirada {
 
 export interface Projeto {
   id: string;
-  nomeCliente: string;
+  name: string;
   marceneiroResponsavel: string;
   status: 'Em andamento' | 'Finalizado' | 'Aguardando materiais' | 'Pausado' | 'Cancelado';
   materiaisUsados: {
@@ -29,6 +28,7 @@ export interface Projeto {
   }[];
   dataCriacao: string;
   dataAtualizacao: string;
+  valor: number;
 }
 
 export interface InventoryContextType {

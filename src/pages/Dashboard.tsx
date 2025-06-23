@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useInventory } from '../context/InventoryContext';
 import { StatsCard } from '../components/StatsCard';
@@ -41,14 +40,14 @@ export const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in w-full max-w-none">
       <div>
         <h1 className="text-3xl font-bold text-wood-800 mb-2">Dashboard</h1>
         <p className="text-wood-600">Visão geral do sistema de marcenaria</p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
         <StatsCard
           title="Total de Ferragens"
           value={totalFerragens}
@@ -79,7 +78,7 @@ export const Dashboard: React.FC = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
         {/* Retiradas Recentes */}
         <Card>
           <CardHeader>
@@ -94,7 +93,7 @@ export const Dashboard: React.FC = () => {
                 <div key={retirada.id} className="flex items-center justify-between p-3 bg-wood-50 rounded-lg">
                   <div>
                     <p className="font-medium text-wood-800">
-                      {retirada.ferragem.tipo} - {retirada.ferragem.marca}
+                      {retirada.ferragem ? retirada.ferragem.tipo : 'Ferragem removida'} - {retirada.ferragem ? retirada.ferragem.marca : 'Marca removida'}
                     </p>
                     <p className="text-sm text-wood-600">
                       Cliente: {retirada.cliente} | Qtd: {retirada.quantidade}
@@ -128,7 +127,7 @@ export const Dashboard: React.FC = () => {
               {projetosRecentes.map((projeto) => (
                 <div key={projeto.id} className="flex items-center justify-between p-3 bg-wood-50 rounded-lg">
                   <div>
-                    <p className="font-medium text-wood-800">{projeto.nomeCliente}</p>
+                    <p className="font-medium text-wood-800">{projeto.name}</p>
                     <p className="text-sm text-wood-600">
                       Marceneiro: {projeto.marceneiroResponsavel}
                     </p>
@@ -170,7 +169,7 @@ export const Dashboard: React.FC = () => {
                   <div key={ferragem.id} className="flex items-center justify-between p-3 bg-white rounded-lg border border-red-200">
                     <div>
                       <p className="font-medium text-red-800">
-                        {ferragem.tipo} - {ferragem.marca}
+                        {ferragem.tipo ? ferragem.tipo : 'Ferragem removida'} - {ferragem.marca ? ferragem.marca : 'Marca removida'}
                       </p>
                       <p className="text-sm text-red-600">
                         Estoque: {ferragem.quantidade} unidades

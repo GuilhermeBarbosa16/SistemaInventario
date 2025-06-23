@@ -38,7 +38,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       <div className="flex min-h-screen">
         <AppSidebar />
         
-        <main className="flex-1 p-6 bg-gradient-to-br from-wood-50 to-wood-100">
+        <main className="flex-1 min-w-0 p-2 sm:p-4 md:p-6 bg-gradient-to-br from-wood-50 to-wood-100">
           <div className="mb-4 flex justify-between items-center">
             <div className="flex items-center gap-2">
               <SidebarTrigger />

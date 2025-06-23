@@ -128,6 +128,58 @@ class ApiService {
   getToken(): string | null {
     return this.token;
   }
+
+  // Criar movimentação de estoque
+  async createStockMovement(data: any) {
+    return this.request('/stock-movements', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  // Buscar movimentações de estoque
+  async getStockMovements() {
+    return this.request('/stock-movements', { method: 'GET' });
+  }
+
+  // Criar movimentação de ferramenta
+  async createToolMovement(data: any) {
+    return this.request('/tool-movements', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  // Buscar movimentações de ferramentas
+  async getToolMovements() {
+    return this.request('/tool-movements', { method: 'GET' });
+  }
+
+  // Buscar ferramentas/ferragens
+  async getTools() {
+    return this.request('/tools', { method: 'GET' });
+  }
+
+  // Criar ferramenta/ferragem
+  async createTool(data: any) {
+    return this.request('/tools', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  // Criar projeto
+  async createProject(data: any) {
+    return this.request('/projects', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  // Buscar projetos
+  async getProjects() {
+    return this.request('/projects', { method: 'GET' });
+  }
 }
 
 export const apiService = new ApiService();

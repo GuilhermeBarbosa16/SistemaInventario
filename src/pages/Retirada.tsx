@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useInventory } from '../context/InventoryContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,9 +6,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Minus, AlertTriangle, CheckCircle } from 'lucide-react';
+import apiService from '@/lib/api';
+import { toast } from 'sonner';
 
 export const Retirada: React.FC = () => {
-  const { ferragens, addRetirada } = useInventory();
+  const { ferragens } = useInventory();
   const [formData, setFormData] = useState({
     ferragemId: '',
     quantidade: 0,
@@ -17,22 +18,39 @@ export const Retirada: React.FC = () => {
     data: new Date().toISOString().split('T')[0],
     responsavel: ''
   });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const selectedFerragem = ferragens.find(f => f.id === formData.ferragemId);
+  const selectedFerragem = ferragens.find(f => String(f.id) === formData.ferragemId);
   const isQuantityValid = selectedFerragem ? formData.quantidade <= selectedFerragem.quantidade : false;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedFerragem) return;
-    
-    addRetirada(formData);
-    setFormData({
-      ferragemId: '',
-      quantidade: 0,
-      cliente: '',
-      data: new Date().toISOString().split('T')[0],
-      responsavel: ''
-    });
+    setIsLoading(true);
+    try {
+      const response = await apiService.createToolMovement({
+        tool_id: selectedFerragem.id,
+        type: 'saida',
+        quantity: formData.quantidade,
+        reason: `Retirada para o cliente: ${formData.cliente} - Responsável: ${formData.responsavel}`,
+        // outros campos se quiser
+      });
+      toast.success('Retirada registrada com sucesso!');
+      setFormData({
+        ferragemId: '',
+        quantidade: 0,
+        cliente: '',
+        data: new Date().toISOString().split('T')[0],
+        responsavel: ''
+      });
+      // Aqui você pode atualizar o estoque local, buscar novamente, etc.
+    } catch (err: any) {
+      toast.error('Erro ao registrar retirada', {
+        description: err?.message || 'Erro desconhecido',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -64,7 +82,7 @@ export const Retirada: React.FC = () => {
                   </SelectTrigger>
                   <SelectContent>
                     {ferragens.map((ferragem) => (
-                      <SelectItem key={ferragem.id} value={ferragem.id}>
+                      <SelectItem key={ferragem.id} value={String(ferragem.id)}>
                         <div className="flex items-center justify-between w-full">
                           <span>
                             {ferragem.tipo} - {ferragem.marca}
@@ -174,9 +192,9 @@ export const Retirada: React.FC = () => {
             <Button 
               type="submit" 
               className="w-full bg-wood-600 hover:bg-wood-700"
-              disabled={!selectedFerragem || formData.quantidade <= 0 || !isQuantityValid}
+              disabled={!selectedFerragem || formData.quantidade <= 0 || !isQuantityValid || isLoading}
             >
-              Registrar Retirada
+              {isLoading ? 'Registrando...' : 'Registrar Retirada'}
             </Button>
           </form>
         </CardContent>
